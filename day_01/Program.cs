@@ -13,8 +13,6 @@ namespace day_01
             var sub = new Submarine(inputPath);
             Console.WriteLine(sub.CountIncreasingDepth());
         }
-
-
     }
 
     class Submarine
