@@ -30,7 +30,7 @@ namespace Advent2021
 
         public SubmarineCoordinate Coordinate { get; set; }
 
-        private List<SubmarineMovement> loadCourseFile(string courseFilePath)
+        private SubmarineCourse loadCourseFile(string courseFilePath)
         {
             return File.ReadLines(courseFilePath)
                 .Select(line => {
@@ -61,23 +61,26 @@ namespace Advent2021
         {
             var oldX = this.Coordinate.xPos;
             var oldDepth = this.Coordinate.depth;
+            var oldAim = this.Coordinate.aim;
             switch (movement.direction)
             {
                 case Direction.forward:
-                    var newX = this.Coordinate.xPos + movement.magnitude;
-                    this.Coordinate = new SubmarineCoordinate(oldDepth, newX);
+                    var forwardX = oldX + movement.magnitude;
+                    var forwardDepth = oldDepth + oldAim * movement.magnitude;
+                    this.Coordinate = new SubmarineCoordinate(forwardDepth, forwardX, oldAim);
                     break;
                 case Direction.backward:
-                    var backX = this.Coordinate.xPos - movement.magnitude;
-                    this.Coordinate = new SubmarineCoordinate(oldDepth, backX);
+                    var backX = oldX - movement.magnitude;
+                    var backDepth = oldDepth - oldAim * movement.magnitude;
+                    this.Coordinate = new SubmarineCoordinate(backDepth, backX, oldAim);
                     break;
                 case Direction.up:
-                    var upDepth = this.Coordinate.depth - movement.magnitude;
-                    this.Coordinate = new SubmarineCoordinate(upDepth, oldX);
+                    var upAim = oldAim - movement.magnitude;
+                    this.Coordinate = new SubmarineCoordinate(oldDepth, oldX, upAim);
                     break;
                 case Direction.down:
-                    var downDepth = this.Coordinate.depth + movement.magnitude;
-                    this.Coordinate = new SubmarineCoordinate(downDepth, oldX);
+                    var downAim = oldAim + movement.magnitude;
+                    this.Coordinate = new SubmarineCoordinate(oldDepth, oldX, downAim);
                     break;
                 default:
                     throw new Exception("Unknown direction from ship command");
@@ -101,11 +104,13 @@ namespace Advent2021
     {
         public int depth { get; set; }
         public int xPos { get; set; }
+        public int aim { get; set; }
 
-        public SubmarineCoordinate(int depth, int xPos)
+        public SubmarineCoordinate(int depth, int xPos, int aim)
         {
             this.depth = depth;
             this.xPos = xPos;
+            this.aim = aim;
         }
     }
 
