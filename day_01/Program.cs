@@ -27,11 +27,18 @@ namespace day_01
         }
 
         public List<int> ReadSonar(string path) {
-            var readings = File.ReadLines(path)
-                .Select(line => int.Parse(line))
-                .ToList();
+            var readings = Utils.ReadIntsFromLines(path);
+            var aggregatedReadings = new List<int>();
 
-            return readings;
+            for (int i = 0; i < readings.LongCount() - 2; i++) {
+                int first = readings[i];
+                int second = readings[i + 1];
+                int third = readings[i + 2];
+                int slidingWindow = first + second + third;
+                aggregatedReadings.Add(slidingWindow);
+            }
+
+            return aggregatedReadings;
         }
 
         public int CountIncreasingDepth() {
@@ -50,6 +57,19 @@ namespace day_01
             }
 
             return increasingDepthCount;
+        }
+    }
+
+    class Utils
+    {
+        public static List<int> ReadIntsFromLines(string path)
+        {
+            var nums = File.ReadLines(path)
+                .Select(line => int.Parse(line))
+                .ToList();
+
+            return nums;
+
         }
     }
 }
