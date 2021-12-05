@@ -335,7 +335,7 @@ namespace Advent2021
 
         public BingoSystemOpts()
         {
-            this.bingoGameFilePath = "./bingo_game.csv";
+            this.bingoGameFilePath = "./data/bingo_game.csv";
         }
     }
 }
