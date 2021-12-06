@@ -75,7 +75,7 @@ namespace AoC2021
                   var end = this.GenerateCoordFromStringPoint(points[1]);
                   return new Line(start, end);
               })
-              .Where(line => line.IsHorizontal() || line.IsVertical())
+              .Where(line => line.IsHorizontal() || line.IsVertical() || line.IsDiagonal())
               .ToList();
             this.MaxCoordinateValue += 1;
         }
@@ -127,11 +127,18 @@ namespace AoC2021
             return this.Start.X == this.End.X;
         }
 
+        public bool IsDiagonal()
+        {
+            var horizontalDiff = Math.Abs(this.Start.X - this.End.X);
+            var verticalDiff = Math.Abs(this.Start.Y - this.End.Y);
+            return horizontalDiff == verticalDiff;
+        }
+
         public List<Coordinate> GetCoordinatesOnLine()
         {
-            if (!this.IsHorizontal() && !this.IsVertical())
+            if (!this.IsHorizontal() && !this.IsVertical() && !this.IsDiagonal())
             {
-                throw new Exception("Cannot get coordinates for diagonal lines");
+                throw new Exception("Cannot get coordinates for crooked lines");
             }
 
             var coords = new List<Coordinate>();
@@ -159,6 +166,19 @@ namespace AoC2021
                 for (int x = smallerX; x <= largerX; x++)
                 {
                     coords.Add(new Coordinate(x, constY));
+                }
+            }
+            else if (this.IsDiagonal())
+            {
+
+                var diff = Math.Abs(this.Start.X - this.End.X);
+                var xIncrement = this.Start.X < this.End.X ? 1 : -1;
+                var yIncrement = this.Start.Y < this.End.Y ? 1 : -1;
+                for (int i = 0; i <= diff; i++)
+                {
+                    var x = this.Start.X + i * xIncrement;
+                    var y = this.Start.Y + i * yIncrement;
+                    coords.Add(new Coordinate(x, y));
                 }
             }
             else
