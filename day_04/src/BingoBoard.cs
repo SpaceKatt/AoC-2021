@@ -4,11 +4,11 @@ namespace Advent2021
     {
         int boardSize;
         int winningNumber;
-        public int boardId { get; }
         List<List<int>> board;
         List<List<bool>> marked;
         IDictionary<int, Coordinate> numberToCoordMap;
 
+        public int boardId { get; }
         public bool HasWon { get; set; }
 
         public BingoBoard(List<List<string>> board, int boardId)
