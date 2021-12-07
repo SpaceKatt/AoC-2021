@@ -15,7 +15,7 @@ namespace Advent2021
     class CrabSubmarineOptimizer
     {
         List<int> CrabPositions;
-        List<int> FuelCostAtPosition;
+        List<long> FuelCostAtPosition;
 
         public CrabSubmarineOptimizer(string crabConfigPath)
         {
@@ -29,7 +29,7 @@ namespace Advent2021
             Console.WriteLine($"{minCost}");
         }
 
-        public int GetMinimumCost()
+        public long GetMinimumCost()
         {
             var min = this.FuelCostAtPosition[0];
             foreach (var cost in this.FuelCostAtPosition)
@@ -42,7 +42,7 @@ namespace Advent2021
             return min;
         }
 
-        private List<int> GenerateFuelCostAtPosition(List<int> crabPositions)
+        private List<long> GenerateFuelCostAtPosition(List<int> crabPositions)
         {
             var maxPosition = -1;
             foreach (var position in this.CrabPositions)
@@ -50,7 +50,7 @@ namespace Advent2021
                 if (position > maxPosition) maxPosition = position;
             }
             var numberOfPositions = maxPosition + 1;
-            var fuelCostAtPosition = new List<int>(new int[numberOfPositions]);
+            var fuelCostAtPosition = new List<long>(new long[numberOfPositions]);
             foreach (var position in crabPositions)
             {
                 var crabFuelCost = this.GenerateSingleCrabFuelCost(position, numberOfPositions);
@@ -71,15 +71,25 @@ namespace Advent2021
                 .ToList();
         }
 
-        private List<int> GenerateSingleCrabFuelCost(int crabPosition, int numberOfPositions)
+        private List<long> GenerateSingleCrabFuelCost(int crabPosition, int numberOfPositions)
         {
-            var fuelCostAtPosition = new List<int>(new int[numberOfPositions]);
+            var fuelCostAtPosition = new List<long>(new long[numberOfPositions]);
             for (int i = 0; i < numberOfPositions; i++)
             {
-                var cost = Math.Abs(crabPosition - i);
+                var cost = this.GeometricSum(Math.Abs(crabPosition - i));
                 fuelCostAtPosition[i] = cost;
             }
             return fuelCostAtPosition;
+        }
+
+        private long GeometricSum(int n)
+        {
+            long sum = 0;
+            for (long i = 1; i <= n; i++)
+            {
+                sum += i;
+            }
+            return sum;
         }
     }
 }
