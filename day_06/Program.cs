@@ -11,7 +11,7 @@ namespace Advent2021
             var simulation = new FishSimulator("./lanternfish.csv");
             simulation.PrintSimulationState();
 
-            simulation.SimulateDays(80);
+            simulation.SimulateDays(256);
             simulation.PrintSimulationState();
 
             // simulation.SimulateDays(1);
@@ -24,7 +24,7 @@ namespace Advent2021
         private int MaturityCost = 2;
         private int ReproductiveCycleLength = 7;
 
-        private List<int> FishAtAge;
+        private List<long> FishAtAge;
 
         public FishSimulator(string simulationConfigPath)
         {
@@ -49,10 +49,10 @@ namespace Advent2021
             Console.WriteLine($"Total:\t\t{this.GetTotalPopulation()}");
         }
 
-        public int GetTotalPopulation()
+        public long GetTotalPopulation()
         {
-            var popSum = 0;
-            foreach (int count in this.FishAtAge)
+            long popSum = 0;
+            foreach (long count in this.FishAtAge)
             {
                 popSum += count;
             }
@@ -70,7 +70,7 @@ namespace Advent2021
         private void SimulateDay()
         {
             var fishBirthingToday = this.FishAtAge[0];
-            var newFishAtAge = new List<int>();
+            var newFishAtAge = new List<long>();
 
             for (int i = 1; i < this.FishAtAge.Count(); i++)
             {
@@ -83,19 +83,19 @@ namespace Advent2021
             this.FishAtAge = newFishAtAge;
         }
 
-        private List<int> GenerateFishAtAgeFromConfig(string simulationConfigPath)
+        private List<long> GenerateFishAtAgeFromConfig(string simulationConfigPath)
         {
-            var individualFish = File.ReadLines(simulationConfigPath)
+            List<long> individualFish = File.ReadLines(simulationConfigPath)
                 .First()
                 .Split(',')
-                .Select(line => int.Parse(line))
+                .Select(line => long.Parse(line))
                 .ToList();
 
-            var fishAtAge = new List<int>(new int[this.ReproductiveCycleLength + this.MaturityCost]);
+            var fishAtAge = new List<long>(new long[this.ReproductiveCycleLength + this.MaturityCost]);
 
-            foreach (var fish in individualFish)
+            foreach (long fish in individualFish)
             {
-                fishAtAge[fish]++;
+                fishAtAge[Convert.ToInt32(fish)]++;
             }
 
             return fishAtAge;
