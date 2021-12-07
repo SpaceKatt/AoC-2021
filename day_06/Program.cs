@@ -13,9 +13,6 @@ namespace Advent2021
 
             simulation.SimulateDays(256);
             simulation.PrintSimulationState();
-
-            // simulation.SimulateDays(1);
-            // simulation.PrintSimulationState();
         }
     }
 
@@ -29,24 +26,6 @@ namespace Advent2021
         public FishSimulator(string simulationConfigPath)
         {
             this.FishAtAge = this.GenerateFishAtAgeFromConfig(simulationConfigPath);
-        }
-
-        public void PrintSimulationState()
-        {
-            Console.WriteLine("--- Simulation State");
-            Console.WriteLine("Age\t\tPopulation Count");
-            for (int i = 0; i < this.FishAtAge.Count(); i++)
-            {
-                Console.WriteLine($"{i}\t\t{this.FishAtAge[i]}");
-            }
-            Console.WriteLine();
-            this.PrintTotalPopulation();
-            Console.WriteLine();
-        }
-
-        public void PrintTotalPopulation()
-        {
-            Console.WriteLine($"Total:\t\t{this.GetTotalPopulation()}");
         }
 
         public long GetTotalPopulation()
@@ -81,6 +60,24 @@ namespace Advent2021
             newFishAtAge.Add(fishBirthingToday);
 
             this.FishAtAge = newFishAtAge;
+        }
+
+        public void PrintSimulationState()
+        {
+            Console.WriteLine("--- Simulation State");
+            Console.WriteLine("Age\t\tPopulation Count");
+            for (int i = 0; i < this.FishAtAge.Count(); i++)
+            {
+                Console.WriteLine($"{i}\t\t{this.FishAtAge[i]}");
+            }
+            Console.WriteLine();
+            this.PrintTotalPopulation();
+            Console.WriteLine();
+        }
+
+        public void PrintTotalPopulation()
+        {
+            Console.WriteLine($"Total:\t\t{this.GetTotalPopulation()}");
         }
 
         private List<long> GenerateFishAtAgeFromConfig(string simulationConfigPath)
