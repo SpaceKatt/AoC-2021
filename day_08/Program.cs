@@ -35,13 +35,20 @@ namespace Advent2021
         public void PrintSignalCount()
         {
             var counter = new int[10];
+            var sum = 0;
             foreach (var signal in this.Signals)
+            {
+                sum += signal.OutputNumber;
                 foreach (var output in signal.OutputNumbers)
                     counter[output]++;
+            }
 
             Console.WriteLine("Output\t\tCount");
             for (int i = 0; i < 10; i++)
                 Console.WriteLine($"{i}\t\t{counter[i]}");
+
+            Console.WriteLine();
+            Console.WriteLine($"Total\t\t{sum}");
         }
 
         private List<SegmentSignal> GenerateSegmentSignals(string signalConfigPath)
@@ -62,23 +69,24 @@ namespace Advent2021
         public static int UniquePatternCount = 10;
         public static int OutputCodeCount = 4;
 
-        public static HashSet<char> One = new HashSet<char> { 'c', 'f' };
-        public static HashSet<char> Four = new HashSet<char> { 'b', 'c', 'd', 'f' };
-        public static HashSet<char> Seven = new HashSet<char> { 'a', 'c', 'f' };
-        public static HashSet<char> Eight = new HashSet<char> {'a', 'b', 'c', 'd', 'e', 'f', 'g' };
+        public static HashSet<char> One = new HashSet<char>   { 'a', 'b' };
+        public static HashSet<char> Four = new HashSet<char>  { 'e', 'a', 'f', 'b' };
+        public static HashSet<char> Seven = new HashSet<char> { 'd', 'a', 'b' };
+        public static HashSet<char> Eight = new HashSet<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
 
-        public static HashSet<char> Zero = new HashSet<char> { 'a', 'b', 'c', 'e', 'f', 'g' };
-        public static HashSet<char> Six = new HashSet<char> { 'a', 'b', 'd', 'e', 'f', 'g' };
-        public static HashSet<char> Nine = new HashSet<char> { 'a', 'b', 'c', 'd', 'f', 'g' };
+        public static HashSet<char> Zero = new HashSet<char>  { 'c', 'a', 'g', 'e', 'd', 'b' };
+        public static HashSet<char> Six = new HashSet<char>   { 'c', 'd', 'f', 'g', 'e', 'b' };
+        public static HashSet<char> Nine = new HashSet<char>  { 'c', 'e', 'f', 'a', 'b', 'd' };
 
-        public static HashSet<char> Two = new HashSet<char> { 'a', 'c', 'd', 'e', 'g' };
-        public static HashSet<char> Three = new HashSet<char> { 'a', 'c', 'd', 'f', 'g' };
-        public static HashSet<char> Five = new HashSet<char> { 'a', 'b', 'd', 'f', 'g' };
+        public static HashSet<char> Two = new HashSet<char>   { 'g', 'c', 'd', 'f', 'a' };
+        public static HashSet<char> Three = new HashSet<char> { 'f', 'c', 'b', 'a', 'd' };
+        public static HashSet<char> Five = new HashSet<char>  { 'c', 'd', 'f', 'b', 'e' };
 
         List<string> UniquePatterns;
         List<string> OutputCodes;
 
         public List<int> OutputNumbers { get; private set; }
+        public int OutputNumber { get; private set; }
 
         Dictionary<char, char> SignalMapping;
 
@@ -98,6 +106,14 @@ namespace Advent2021
 
             this.SignalMapping = this.GenerateSignalMapping(this.UniquePatterns);
             this.OutputNumbers = this.GenerateOutputSignal(this.OutputCodes, this.SignalMapping);
+
+            var outputNum = 0;
+            foreach (var num in this.OutputNumbers)
+            {
+                outputNum *= 10;
+                outputNum += num;
+            }
+            this.OutputNumber = outputNum;
         }
 
         public void PrintSignal()
@@ -188,70 +204,70 @@ namespace Advent2021
                 }
             }
 
-            // 'f' is the most common segment
-            var fInx = -1;
+            // 'b' is the most common segment
+            var bInx = -1;
             var maxCount = -1;
             for (int i = 0; i < 7; i++)
             {
                 if (charCount[i] > maxCount)
                 {
-                    fInx = i;
+                    bInx = i;
                     maxCount = charCount[i];
                 }
             }
-            var fSet = new HashSet<char>();
-            fSet.Add((char)('a' + fInx));
-            char f = fSet.First();
-            signalMapping.Add(f, 'f');
-
-            var aSet = new HashSet<char>(sevenSet);
-            aSet.ExceptWith(oneSet);
-            if (aSet.Count() != 1) throw new Exception("Logic error getting 'a'");
-            char a = aSet.First();
-            signalMapping.Add(a, 'a');
-
-            var gSet = new HashSet<char>(zeroSixNine.First());
-            foreach (var set in zeroSixNine) gSet.IntersectWith(set);
-            foreach (var set in twoThreeFive) gSet.IntersectWith(set);
-            gSet.ExceptWith(aSet);
-            if (gSet.Count() != 1) throw new Exception("Logic error getting 'g'");
-            char g = gSet.First();
-            signalMapping.Add(g, 'g');
-
-            var bSet = new HashSet<char>(zeroSixNine.First());
-            foreach (var set in zeroSixNine) bSet.IntersectWith(set);
-            bSet.ExceptWith(aSet);
-            bSet.ExceptWith(gSet);
-            bSet.ExceptWith(fSet);
-            if (bSet.Count() != 1) throw new Exception("Logic error getting 'b'");
+            var bSet = new HashSet<char>();
+            bSet.Add((char)('a' + bInx));
             char b = bSet.First();
             signalMapping.Add(b, 'b');
 
-            var dSet = new HashSet<char>(twoThreeFive.First());
-            foreach (var set in twoThreeFive) dSet.IntersectWith(set);
-            dSet.ExceptWith(aSet);
-            dSet.ExceptWith(gSet);
+            var dSet = new HashSet<char>(sevenSet);
+            dSet.ExceptWith(oneSet);
             if (dSet.Count() != 1) throw new Exception("Logic error getting 'd'");
             char d = dSet.First();
             signalMapping.Add(d, 'd');
 
-            var cSet = new HashSet<char>(sevenSet);
-            cSet.ExceptWith(aSet);
-            cSet.ExceptWith(fSet);
+            var cSet = new HashSet<char>(zeroSixNine.First());
+            foreach (var set in zeroSixNine) cSet.IntersectWith(set);
+            foreach (var set in twoThreeFive) cSet.IntersectWith(set);
+            cSet.ExceptWith(dSet);
             if (cSet.Count() != 1) throw new Exception("Logic error getting 'c'");
             char c = cSet.First();
             signalMapping.Add(c, 'c');
 
-            var eSet = new HashSet<char>(eightSet);
-            eSet.ExceptWith(aSet);
-            eSet.ExceptWith(bSet);
-            eSet.ExceptWith(cSet);
+            var eSet = new HashSet<char>(zeroSixNine.First());
+            foreach (var set in zeroSixNine) eSet.IntersectWith(set);
             eSet.ExceptWith(dSet);
-            eSet.ExceptWith(fSet);
-            eSet.ExceptWith(gSet);
+            eSet.ExceptWith(cSet);
+            eSet.ExceptWith(bSet);
             if (eSet.Count() != 1) throw new Exception("Logic error getting 'e'");
             char e = eSet.First();
             signalMapping.Add(e, 'e');
+
+            var fSet = new HashSet<char>(twoThreeFive.First());
+            foreach (var set in twoThreeFive) fSet.IntersectWith(set);
+            fSet.ExceptWith(dSet);
+            fSet.ExceptWith(cSet);
+            if (fSet.Count() != 1) throw new Exception("Logic error getting 'f'");
+            char f = fSet.First();
+            signalMapping.Add(f, 'f');
+
+            var aSet = new HashSet<char>(sevenSet);
+            aSet.ExceptWith(dSet);
+            aSet.ExceptWith(bSet);
+            if (aSet.Count() != 1) throw new Exception("Logic error getting 'a'");
+            char a = aSet.First();
+            signalMapping.Add(a, 'a');
+
+            var gSet = new HashSet<char>(eightSet);
+            gSet.ExceptWith(dSet);
+            gSet.ExceptWith(eSet);
+            gSet.ExceptWith(aSet);
+            gSet.ExceptWith(fSet);
+            gSet.ExceptWith(bSet);
+            gSet.ExceptWith(cSet);
+            if (gSet.Count() != 1) throw new Exception("Logic error getting 'g'");
+            char g = gSet.First();
+            signalMapping.Add(g, 'g');
 
             return signalMapping;
         }
