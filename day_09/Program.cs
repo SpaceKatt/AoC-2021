@@ -93,7 +93,7 @@ namespace Advent2021
 
             for (int i = 0; i < heightMap.Count(); i++)
             {
-                for (int j = 0; j < heightMap.Count(); j++)
+                for (int j = 0; j < heightMap[i].Count(); j++)
                 {
                     if (marked[i][j])
                     {
