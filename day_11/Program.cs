@@ -15,11 +15,12 @@ namespace Advent2021
             dumbOctopusSim.PrintState();
             Console.WriteLine();
 
-            dumbOctopusSim.AdvanceSteps(100);
+            dumbOctopusSim.AdvanceUntilAllFalsh();
             dumbOctopusSim.PrintState();
             Console.WriteLine();
 
             dumbOctopusSim.PrintFlashCount();
+            Console.WriteLine($"Moves until allflash:\t\t{dumbOctopusSim.MoveCount}");
             Console.WriteLine();
 
             Console.WriteLine("End Day 11");
@@ -30,6 +31,7 @@ namespace Advent2021
     {
         List<List<int>> DumboState;
         public int FlashCount { get; private set; }
+        public int MoveCount { get; private set; }
 
         private static int FlashThreshold = 9;
 
@@ -41,7 +43,7 @@ namespace Advent2021
 
         public void PrintFlashCount()
         {
-            Console.WriteLine($"Flashes:\t\t{this.FlashCount}");
+            Console.WriteLine($"Flashes:\t\t\t{this.FlashCount}");
         }
 
         public void PrintState()
@@ -56,6 +58,11 @@ namespace Advent2021
             }
         }
 
+        public void AdvanceUntilAllFalsh()
+        {
+            while (!this.AdvanceStep()) {};
+        }
+
         public void AdvanceSteps(int stepCount)
         {
             for (int i = 0; i < stepCount; i++)
@@ -64,7 +71,7 @@ namespace Advent2021
             }
         }
 
-        private void AdvanceStep()
+        private bool AdvanceStep()
         {
             var patch = Utils.GenerateMatrixWithDefault<int>(this.DumboState.Count, this.DumboState[0].Count, 1);
             var flashed = Utils.GenerateMatrixWithDefault<bool>(this.DumboState.Count, this.DumboState[0].Count, false);
@@ -79,6 +86,27 @@ namespace Advent2021
                     }
                 }
             }
+            this.MoveCount++;
+            var allFlashed = true;
+            for (int i = 0; i < this.DumboState.Count; i++)
+            {
+                for (int j = 0; j < this.DumboState[0].Count; j++)
+                {
+                    if (allFlashed == false)
+                    {
+                        break;
+                    }
+
+                    allFlashed = flashed[i][j] && allFlashed;
+                }
+            }
+
+            return allFlashed;
+        }
+
+        private void AdvanceUntilFlash()
+        {
+
         }
 
         private void ApplyPatch(List<List<int>> patch, List<List<bool>> flashed)
