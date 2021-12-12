@@ -11,6 +11,7 @@ namespace Advent2021
 
             var parser = new NavigationParser(configString);
             parser.PrintCorruptionScore();
+            parser.PrintAutoCompleteScore();
 
             Console.WriteLine("Finish Day 10");
         }
@@ -65,19 +66,48 @@ namespace Advent2021
 
             Console.WriteLine($"Total corruption score:\t\t{corruptionSum}");
         }
+
+        public void PrintAutoCompleteScore()
+        {
+            if (this.incompleteInstructions.Count < 1)
+            {
+                Console.WriteLine("No incomplete lines!");
+                return;
+            }
+
+            var incompleteScores = new List<long>();
+
+            foreach (var incompleteInstruction in this.incompleteInstructions)
+            {
+                incompleteScores.Add(incompleteInstruction.GetAutoCompleteScore());
+            }
+
+            incompleteScores.Sort();
+            int middleIndex = incompleteScores.Count / 2;
+            Console.WriteLine($"Middle AutoComplete Score:\t\t{incompleteScores[middleIndex]}");
+        }
     }
 
     class NavigationInstruction
     {
         public NavigationInstructionState InstructionState {get; private set; }
+        private List<char> AutoCompleteSequence;
         private char FirstIllegalChar;
 
-        private static Dictionary<char, int> ScoreMap = new Dictionary<char, int>
+        private static Dictionary<char, int> CorruptionScoreMap = new Dictionary<char, int>
         {
            {')', 3},
            {']', 57},
            {'}', 1197},
            {'>', 25137}
+        };
+
+        private static Dictionary<char, int> AutoCompleteScoreMap = new Dictionary<char, int>
+        {
+           {')', 1},
+           {']', 2},
+           {'}', 3},
+           {'>', 4}
         };
 
         private static HashSet<char> ValidChars = new HashSet<char>
@@ -96,8 +126,17 @@ namespace Advent2021
             {'>', '<'},
         };
 
+        private static Dictionary<char, char> OpenCharToClose = new Dictionary<char, char>
+        {
+            {'{', '}'},
+            {'(', ')'},
+            {'[', ']'},
+            {'<', '>'},
+        };
+
         public NavigationInstruction(string instruction)
         {
+            this.AutoCompleteSequence = new List<char>();
             this.InstructionState = NavigationInstructionState.INCOMPLETE;
             this.FirstIllegalChar = '\0';
             this.ParseInstruction(instruction.Trim());
@@ -115,7 +154,24 @@ namespace Advent2021
                 throw new Exception("Corruption score does not exist on non-corrupt instruction");
             }
 
-            return NavigationInstruction.ScoreMap[this.FirstIllegalChar];
+            return NavigationInstruction.CorruptionScoreMap[this.FirstIllegalChar];
+        }
+
+        public long GetAutoCompleteScore()
+        {
+            if (!this.IsState(NavigationInstructionState.INCOMPLETE))
+            {
+                throw new Exception("");
+            }
+
+            long autoCompleteScore = 0;
+
+            foreach (var instruction in this.AutoCompleteSequence)
+            {
+                autoCompleteScore = autoCompleteScore * 5 + NavigationInstruction.AutoCompleteScoreMap[instruction];
+            }
+
+            return autoCompleteScore;
         }
 
         private void ParseInstruction(string instruction)
@@ -151,6 +207,15 @@ namespace Advent2021
             if (parenStack.Count == 0)
             {
                 this.InstructionState = NavigationInstructionState.COMPLETE;
+            }
+            else
+            {
+                while (parenStack.Count != 0)
+                {
+                    var currentOpener = parenStack.Pop();
+                    var nextNeededCloser = NavigationInstruction.OpenCharToClose[currentOpener];
+                    this.AutoCompleteSequence.Add(nextNeededCloser);
+                }
             }
         }
     }
