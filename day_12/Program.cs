@@ -11,9 +11,10 @@ namespace Advent2021
 
             var caveConfig = File.ReadAllText("./cave-system.txt");
             var caveSystem = new CaveGraph(caveConfig);
-            caveSystem.PrintPaths();
 
+            caveSystem.PrintPaths();
             Console.WriteLine();
+
             caveSystem.PrintPathCount();
 
             Console.WriteLine("End Day 12");
@@ -23,10 +24,9 @@ namespace Advent2021
     class CaveGraph
     {
         Dictionary<string, HashSet<Cave>> AdjacencyList;
-        Dictionary<string, int> VisitCount;
         int DoubleVisits;
-
-        public List<List<Cave>> Paths { get; private set; }
+        List<List<Cave>> Paths;
+        Dictionary<string, int> VisitCount;
 
         public CaveGraph(string caveConfig)
         {
@@ -52,32 +52,6 @@ namespace Advent2021
                 }
                 Console.WriteLine();
             }
-        }
-
-        private void InsertCavePair(Dictionary<string, HashSet<Cave>> adjacencyList, Cave a, Cave b)
-        {
-            if (!adjacencyList.ContainsKey(a.Name)) adjacencyList.Add(a.Name, new HashSet<Cave>());
-            adjacencyList[a.Name].Add(b);
-            if (!adjacencyList.ContainsKey(b.Name)) adjacencyList.Add(b.Name, new HashSet<Cave>());
-            adjacencyList[b.Name].Add(a);
-
-            if (!this.VisitCount.ContainsKey(a.Name)) this.VisitCount[a.Name] = 0;
-            if (!this.VisitCount.ContainsKey(b.Name)) this.VisitCount[b.Name] = 0;
-        }
-
-        private Dictionary<string, HashSet<Cave>> GenerateAdjacencyList(string caveConfig)
-        {
-            var adjacencyList = new Dictionary<string, HashSet<Cave>>();
-
-            foreach (var line in caveConfig.Split('\n'))
-            {
-                var startAndEnd = line.Split('-');
-                var start = new Cave(startAndEnd[0]);
-                var end = new Cave(startAndEnd[1]);
-                this.InsertCavePair(adjacencyList, start, end);
-            }
-
-            return adjacencyList;
         }
 
         private List<List<Cave>> FindAllPaths()
@@ -130,6 +104,32 @@ namespace Advent2021
 
             pathBuilder.RemoveAt(pathBuilder.Count - 1);
             this.VisitCount[cave.Name]--;
+        }
+
+        private Dictionary<string, HashSet<Cave>> GenerateAdjacencyList(string caveConfig)
+        {
+            var adjacencyList = new Dictionary<string, HashSet<Cave>>();
+
+            foreach (var line in caveConfig.Split('\n'))
+            {
+                var startAndEnd = line.Split('-');
+                var start = new Cave(startAndEnd[0]);
+                var end = new Cave(startAndEnd[1]);
+                this.InsertCavePair(adjacencyList, start, end);
+            }
+
+            return adjacencyList;
+        }
+
+        private void InsertCavePair(Dictionary<string, HashSet<Cave>> adjacencyList, Cave a, Cave b)
+        {
+            if (!adjacencyList.ContainsKey(a.Name)) adjacencyList.Add(a.Name, new HashSet<Cave>());
+            adjacencyList[a.Name].Add(b);
+            if (!adjacencyList.ContainsKey(b.Name)) adjacencyList.Add(b.Name, new HashSet<Cave>());
+            adjacencyList[b.Name].Add(a);
+
+            if (!this.VisitCount.ContainsKey(a.Name)) this.VisitCount[a.Name] = 0;
+            if (!this.VisitCount.ContainsKey(b.Name)) this.VisitCount[b.Name] = 0;
         }
     }
 
