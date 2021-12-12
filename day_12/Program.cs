@@ -23,13 +23,15 @@ namespace Advent2021
     class CaveGraph
     {
         Dictionary<string, HashSet<Cave>> AdjacencyList;
-        Dictionary<string, bool> Visited;
+        Dictionary<string, int> VisitCount;
+        int DoubleVisits;
 
         public List<List<Cave>> Paths { get; private set; }
 
         public CaveGraph(string caveConfig)
         {
-            this.Visited = new Dictionary<string, bool>();
+            this.DoubleVisits = 0;
+            this.VisitCount = new Dictionary<string, int>();
             this.AdjacencyList = this.GenerateAdjacencyList(caveConfig);
             this.Paths = this.FindAllPaths();
         }
@@ -59,8 +61,8 @@ namespace Advent2021
             if (!adjacencyList.ContainsKey(b.Name)) adjacencyList.Add(b.Name, new HashSet<Cave>());
             adjacencyList[b.Name].Add(a);
 
-            if (!this.Visited.ContainsKey(a.Name)) this.Visited[a.Name] = false;
-            if (!this.Visited.ContainsKey(b.Name)) this.Visited[b.Name] = false;
+            if (!this.VisitCount.ContainsKey(a.Name)) this.VisitCount[a.Name] = 0;
+            if (!this.VisitCount.ContainsKey(b.Name)) this.VisitCount[b.Name] = 0;
         }
 
         private Dictionary<string, HashSet<Cave>> GenerateAdjacencyList(string caveConfig)
@@ -91,7 +93,7 @@ namespace Advent2021
         private void SearchPath(List<List<Cave>> paths, List<Cave> pathBuilder, Cave cave)
         {
             pathBuilder.Add(cave);
-            this.Visited[cave.Name] = true;
+            this.VisitCount[cave.Name]++;
 
             if (cave.Name == Cave.EndCave)
             {
@@ -102,16 +104,32 @@ namespace Advent2021
                 var neighbors = this.AdjacencyList[cave.Name];
                 foreach (var neighbor in neighbors)
                 {
-                    if (neighbor.IsBigCave || !this.Visited[neighbor.Name])
+                    if (neighbor.IsBigCave)
                     {
                         this.SearchPath(paths, pathBuilder, neighbor);
                     }
-
+                    else if (neighbor.Name == Cave.EndCave || neighbor.Name == Cave.StartCave)
+                    {
+                        if (this.VisitCount[neighbor.Name] < 1)
+                        {
+                            this.SearchPath(paths, pathBuilder, neighbor);
+                        }
+                    }
+                    else if (this.VisitCount[neighbor.Name] < 1)
+                    {
+                        this.SearchPath(paths, pathBuilder, neighbor);
+                    }
+                    else if (this.VisitCount[neighbor.Name] < 2 && this.DoubleVisits < 1)
+                    {
+                        this.DoubleVisits++;
+                        this.SearchPath(paths, pathBuilder, neighbor);
+                        this.DoubleVisits--;
+                    }
                 }
             }
 
             pathBuilder.RemoveAt(pathBuilder.Count - 1);
-            this.Visited[cave.Name] = false;
+            this.VisitCount[cave.Name]--;
         }
     }
 
